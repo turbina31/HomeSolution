@@ -202,14 +202,70 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public void reasignarEmpleadoEnProyecto(Integer numero, Integer legajo, String titulo) throws Exception {
-		// TODO Auto-generated method stub
-		
+		Proyecto proyecto = proyectos.get(numero);
+		if(proyecto == null)
+            throw new RuntimeException("El número de proyecto no está registrado");
+
+        Empleado empleadoEnReemplazo = (Empleado) empleados.get(legajo.toString());
+        if(empleadoEnReemplazo == null)
+            throw new RuntimeException("No existe ningun empleado con ese legajo");
+
+        if(!empleadoEnReemplazo.estaLibre())
+            throw new RuntimeException("Este empleado no esta libre");
+
+
+        Tarea tarea = tareas.get(titulo);
+        if (tarea == null)
+            throw new Exception("La tarea no está registrada");
+
+        if (!proyecto.perteneceAestaTarea(titulo))
+            throw new Exception("La tarea no pertenece al proyecto");
+
+        if (tarea.obtenerEmpleado() == null)
+            throw new Exception("La tarea no tiene asignado ningun empleado previamente");
+
+        //Primero libero al empleado
+        tarea.liberarResponsable();
+
+        //Ahora le reasigno al empleado con menos retrasos
+        tarea.asignarEmpleado(empleadoEnReemplazo);
 	}
 
 	@Override
 	public void reasignarEmpleadoConMenosRetraso(Integer numero, String titulo) throws Exception {
-		// TODO Auto-generated method stub
-		
+        Proyecto proyecto = proyectos.get(numero);
+		if(proyecto == null)
+            throw new RuntimeException("El número de proyecto no está registrado");
+
+        //Primero valido que este libre, despues en una primer instacia asigno al primer empleado libre
+        //despues voy viendo cual es el que tiene menos retrasos
+        Empleado empleadoConMenosRetraso = null;
+        for(IEmpleado empleado : empleados.values() ){
+            if(empleado.estaLibre()){
+                if(empleadoConMenosRetraso == null || (empleado.obtenerRetrasos() < empleadoConMenosRetraso.obtenerRetrasos()))
+                    empleadoConMenosRetraso = (Empleado) empleado;
+            }
+        }
+
+        if(empleadoConMenosRetraso == null)
+            throw new RuntimeException("No existe ningun empleado libre");
+
+        Tarea tarea = tareas.get(titulo);
+        if (tarea == null)
+            throw new Exception("La tarea no está registrada");
+
+        if (!proyecto.perteneceAestaTarea(titulo))
+            throw new Exception("La tarea no pertenece al proyecto");
+
+        if (tarea.obtenerEmpleado() == null)
+            throw new Exception("La tarea no tiene asignado ningun empleado previamente");
+
+        //Primero libero al empleado
+        tarea.liberarResponsable();
+
+        //Ahora le reasigno al empleado con menos retrasos
+        tarea.asignarEmpleado(empleadoConMenosRetraso);
+
 	}
 
 	@Override
