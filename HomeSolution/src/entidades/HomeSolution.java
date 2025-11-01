@@ -3,6 +3,8 @@ package entidades;
 import java.time.LocalDate;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 public class HomeSolution implements IHomeSolution{
 	private HashMap<String, IEmpleado> empleados;
 	private HashMap<String, EnpleadoDePlanta> empleadosDePlantas;
@@ -36,7 +38,7 @@ public class HomeSolution implements IHomeSolution{
         EmpleadoPorHora empleado = new EmpleadoPorHora(nombre, valor);
         empleados.put(nombre, empleado);
         empleadosLibres.push(empleado);
-		
+		JOptionPane.showMessageDialog(null, "Empleado " + nombre + " registrado con exito!");
 	}
 
 	@Override
@@ -348,7 +350,14 @@ public class HomeSolution implements IHomeSolution{
 	@Override
 	public List<Tupla<Integer, String>> empleados() {
 		// TODO Auto-generated method stub
-		return null;
+        List<Tupla<Integer, String>> lista = new ArrayList<>();
+
+        for(IEmpleado empleado: empleados.values()) {
+            Integer legajo = empleado.obtenerLegajo();
+            String nombre = empleado.obtenerNombre();
+            lista.add(new Tupla<>(legajo, nombre));
+        }
+		return lista;
 	}
 
 	@Override
