@@ -82,7 +82,7 @@ public class FormularioEmpleado extends JPanel {
         String[] items={"INICIAL","TECNICO","EXPERTO"};
         cCategoria=new JComboBox(items);
         agregaContratado=new JButton("Agregar nuevo Contratado");
-        agregaPermanente=new JButton("Agrgar nuevo Permanente");
+        agregaPermanente=new JButton("Agregar nuevo Permanente");
         volver=new JButton("Volver al menu");
         formularioEmpleado=new JPanel();
         formularioEmpleado.setLayout(new GridBagLayout());

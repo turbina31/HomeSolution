@@ -190,4 +190,14 @@ public class Proyecto {
 		return domicilio;
 	}
     
+    public String mostrarInfo() {
+        return "Proyecto: " +
+            "codigo=" + codigoProyecto +
+            ", domicilio='" + domicilio + '\'' +
+            ", inicio='" + fechaInicio + '\'' +
+            ", fin='" + fechaFin + '\'' +
+            ", estado='" + estado + '\'' +
+            ", tareas=" + (tareas != null ? tareas.size() : 0) +
+            ", empleadosLibres=" + (empleadosLibres != null ? empleadosLibres.size() : 0);
+    }
 }

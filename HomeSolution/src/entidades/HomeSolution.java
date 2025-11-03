@@ -48,6 +48,7 @@ public class HomeSolution implements IHomeSolution{
         EnpleadoDePlanta empleado = new EnpleadoDePlanta(nombre, valor, categoria);
         empleados.put(nombre, empleado);
         empleadosDePlantaLibres.push(empleado);
+		JOptionPane.showMessageDialog(null, "Empleado " + nombre + " registrado con exito!");
 	}
 
 	@Override
@@ -289,32 +290,45 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosPendientes() {
-		// TODO Auto-generated method stub
-		return null;
+        List<Tupla<Integer, String>> pendientes = new ArrayList<>();
+        for (Proyecto tupla : listaProyectos) {
+			if (tupla.obtenerEstado() == "Pendiente") {
+				pendientes.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+			}
+		}
+		return pendientes;
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosActivos() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Tupla<Integer, String>> activos = new ArrayList<>();
+        for (Proyecto tupla : listaProyectos) {
+			if (tupla.obtenerEstado() == "Activo") {
+				activos.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+			}
+		}
+		return activos;
 	}
 
 	@Override
 	public Object[] empleadosNoAsignados() {
-		// TODO Auto-generated method stub
-		return null;
+		Object[] empleadosNoAsignados = new Object[empleadosLibres.size()];
+
+        for(int i = 0; i < empleadosLibres.size(); i++) {
+            empleadosNoAsignados[i] = empleadosLibres.get(i);
+        }
+		return empleadosNoAsignados;
 	}
 
 	@Override
 	public boolean estaFinalizado(Integer numero) {
-		// TODO Auto-generated method stub
-		return false;
+		return proyectos.get(numero).obtenerEstado() == "finalizado";
 	}
 
 	@Override
 	public int consultarCantidadRetrasosEmpleado(Integer legajo) {
-		// TODO Auto-generated method stub
-		return 0;
+        String nombre = obtenerEmpleadoPorLegajo(legajo);
+		return empleados.get(nombre).obtenerRetrasos();
 	}
 
 	@Override
@@ -331,14 +345,20 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public Object[] tareasDeUnProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+        Proyecto proyecto = proyectos.get(numero);
+        List listaTareas = proyecto.obtenerTareas();
+        Object[] tareasDeProyecto = new Object[listaTareas.size()];
+
+        for(int i = 0; i < listaTareas.size(); i++) {
+            tareasDeProyecto[i] = listaTareas.get(i);
+        }
+
+		return tareasDeProyecto;
 	}
 
 	@Override
 	public String consultarDomicilioProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		return proyectos.get(numero).obtenerDomicilio();
 	}
 
 	@Override
@@ -362,8 +382,16 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public String consultarProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		return proyectos.get(numero).mostrarInfo();
 	}
-    
+
+    private String obtenerEmpleadoPorLegajo(Integer legajo) {
+        for (IEmpleado empleado : empleados.values()) {
+            if (empleado.obtenerLegajo().equals(legajo)) {
+                return empleado.obtenerNombre();
+            }
+        }
+
+        throw new RuntimeException("No se encontró ningún empleado con legajo: " + legajo);
+    }
 }
