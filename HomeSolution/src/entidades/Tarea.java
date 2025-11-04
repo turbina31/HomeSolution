@@ -16,12 +16,17 @@ public class Tarea {
 
     // Constructor
     public Tarea(String titulo, String descripcion, double duracionDias) {
+    try {
         if (titulo == null || titulo.isEmpty())
             throw new RuntimeException("El título de la tarea no puede ser nulo o vacío");
         if (descripcion == null || descripcion.isEmpty())
             throw new RuntimeException("La descripción de la tarea no puede ser nula o vacía");
         if (duracionDias <= 0)
             throw new RuntimeException("La duración de la tarea debe ser mayor a 0");
+    } catch (RuntimeException e) {
+        System.out.println("Error al crear la tarea: " + e.getMessage());
+    }
+
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.duracionDias = duracionDias;
@@ -32,6 +37,7 @@ public class Tarea {
         this.estado = tipoDeEstado.pendiente;
     }
 
+
     public IEmpleado obtenerEmpleado() {
         return empleado;
     }
@@ -41,12 +47,16 @@ public class Tarea {
     }
 
     public void asignarEmpleado(IEmpleado empleado) {
-        if (empleado == null)
-            throw new RuntimeException("El empleado no puede ser nulo");
-        if (!empleado.estaLibre())
-            throw new RuntimeException("El empleado no está libre");
-        if (this.empleado != null)
-            this.empleado.estaLibre(); // Liberar empleado anterior, si existe
+        try {
+            if (empleado == null)
+                throw new RuntimeException("El empleado no puede ser nulo");
+            if (!empleado.estaLibre())
+                throw new RuntimeException("El empleado no está libre");
+            if (this.empleado != null)
+                this.empleado.estaLibre();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         this.empleado = empleado;
         empleado.marcarAsignado();
     }

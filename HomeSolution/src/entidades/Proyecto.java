@@ -37,7 +37,7 @@ public class Proyecto {
             throw new RuntimeException("Formato de fecha inválido, debe ser yyyy-mm-dd");
         }
         if (fin.isBefore(inicio))
-            throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio");
+            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
 
         this.codigoProyecto = this.contador++;
         this.domicilio = domicilio;
@@ -66,24 +66,32 @@ public class Proyecto {
 
     public void asignarEmpleado(Tarea tarea, IEmpleado empleado) {
 
-        // Validar que el proyecto no esté finalizado
-        if (this.estado.equals(tipoDeEstado.finalizado))
-            throw new RuntimeException("No se pueden asignar empleados a un proyecto finalizado");
+        try {
+            // Validar que el proyecto no esté finalizado
+            if (this.estado.equals(tipoDeEstado.finalizado))
+                throw new RuntimeException("No se pueden asignar empleados a un proyecto finalizado");
 
-        // Validar que el empleado esté libre (si no es null)
-        if (empleado != null && !empleado.estaLibre())
-            throw new RuntimeException("El empleado debe estar libre");
+            // Validar que el empleado esté libre (si no es null)
+            if (empleado != null && !empleado.estaLibre())
+                throw new RuntimeException("El empleado debe estar libre");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         // Verificar que la tarea pertenece al proyecto
         boolean tareaEncontrada = false;
         Iterator<Tarea> este = tareas.iterator();
         while (este.hasNext()) {
-            if (este.next() == tarea) { // Comparación por referencia
+            if (este.next().obtenerTitulo() == tarea.obtenerTitulo()) { // Comparación por referencia
                 tareaEncontrada = true;
             }
         }
-        if (!tareaEncontrada)
-            throw new RuntimeException("La tarea no pertenece al proyecto");
+        try {
+            if (!tareaEncontrada)
+                throw new RuntimeException("La tarea no pertenece al proyecto");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         // Liberar empleado anterior, si existe
         IEmpleado empleadoAnterior = tarea.obtenerEmpleado();
@@ -199,5 +207,9 @@ public class Proyecto {
             ", estado='" + estado + '\'' +
             ", tareas=" + (tareas != null ? tareas.size() : 0) +
             ", empleadosLibres=" + (empleadosLibres != null ? empleadosLibres.size() : 0);
+    }
+
+    public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
+        return this.historialEmpleados;
     }
 }
