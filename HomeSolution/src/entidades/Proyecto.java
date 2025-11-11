@@ -15,11 +15,9 @@ public class Proyecto {
     private Map<String, Cliente> clientes;
     private List<Tarea> tareas;
     private Map<String, Tarea> tarea;
-    private Stack<IEmpleado> empleadosLibres;
     private String estado; // Reemplaza finalizado
-    private final Estado tipoDeEstado = new Estado();
+    private Estado tipoDeEstado = new Estado();
     private Set<IEmpleado> historialEmpleados;
-    private Map<Integer, Boolean> retrasosEmpleadosPlanta;
     private boolean tieneRetraso = false;
 
     public Proyecto(int codigoProyecto, String domicilio, String fechaInicio, String fechaFin) {
@@ -123,7 +121,6 @@ public class Proyecto {
         IEmpleado empleado = t.obtenerEmpleado();
         if (empleado != null && !empleado.estaLibre()) {
             empleado.estaLibre();
-            empleadosLibres.push(empleado);
             t.asignarEmpleado(null);
         }
     }
@@ -191,3 +188,4 @@ public class Proyecto {
 	}
     
 }
+
