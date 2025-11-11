@@ -5,28 +5,19 @@ import java.util.*;
 
 public class HomeSolution implements IHomeSolution{
 	private HashMap<String, IEmpleado> empleados;
-	private HashMap<String, EnpleadoDePlanta> empleadosDePlantas;
     private Stack<IEmpleado> empleadosLibres;
-    private Stack<EnpleadoDePlanta> empleadosDePlantaLibres;
     private HashMap<String, Tarea> tareas;
     private HashMap<String, Cliente> clientes;
     private HashMap<Integer, Proyecto> proyectos;
     private List<Proyecto> listaProyectos;
-    private Proyecto proyecto;
-    private Map<Integer, Integer> atrasosPorEmpleado;
-    private final Estado tipoDeEstado = new Estado();
 
     public HomeSolution() {
         this.empleados = new HashMap<>();
-        this.empleadosDePlantas = new HashMap<>();
         this.empleadosLibres = new Stack<>();
-        this.empleadosDePlantaLibres = new Stack<>();
         this.tareas = new HashMap<>();
         this.clientes = new HashMap<>();
         this.proyectos = new HashMap<>();
         this.listaProyectos = new ArrayList<>();
-        this.proyecto = null;
-        this.atrasosPorEmpleado = new HashMap<>();
     }
 	
 	@Override
@@ -358,3 +349,4 @@ public class HomeSolution implements IHomeSolution{
 	}
     
 }
+
