@@ -9,10 +9,9 @@ public class Tarea {
     private double diasRetraso;
     private LocalDate fechaEstimada;
     private IEmpleado empleado;
-    private EnpleadoDePlanta enpleadoDePlanta;
     private boolean finalizada; // Nuevo campo
     private String estado; // Reemplaza finalizado
-    private final Estado tipoDeEstado = new Estado();
+    private Estado tipoDeEstado = new Estado();
 
     // Constructor
     public Tarea(String titulo, String descripcion, double duracionDias) {
@@ -27,17 +26,12 @@ public class Tarea {
         this.duracionDias = duracionDias;
         this.diasRetraso = 0;
         this.empleado = null; // Sin asignar inicialmente
-        this.enpleadoDePlanta = null;
         this.finalizada = false;
         this.estado = tipoDeEstado.pendiente;
     }
 
     public IEmpleado obtenerEmpleado() {
         return empleado;
-    }
-
-    public EnpleadoDePlanta obtenerEmpleadoDePlanta(){
-        return enpleadoDePlanta;
     }
 
     public void asignarEmpleado(IEmpleado empleado) {
@@ -93,3 +87,4 @@ public class Tarea {
 	}
     
 }
+
