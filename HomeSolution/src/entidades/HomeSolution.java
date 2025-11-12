@@ -278,26 +278,43 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosPendientes() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Tupla<Integer, String>> pendientes = new ArrayList<>();
+        for (Proyecto tupla : proyectos.values()) {
+            if (tupla.obtenerEstado() == "PENDIENTE") {
+                pendientes.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+            }
+        }
+        return pendientes;
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosActivos() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Tupla<Integer, String>> activos = new ArrayList<>();
+        for (Proyecto tupla : proyectos.values()) {
+            if (tupla.obtenerEstado() == "ACTIVO") {
+                activos.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+            }
+        }
+        return activos;
 	}
 
 	@Override
 	public Object[] empleadosNoAsignados() {
-		// TODO Auto-generated method stub
-		return null;
+		int cantEmpleadosLibres = empleadosLibres.size();
+        Object[] empleadosNoAsignados = new Object[cantEmpleadosLibres];
+
+        for(int i = 0; i < empleadosLibres.size(); i++) {
+            empleadosNoAsignados[i] = empleadosLibres.get(i).obtenerLegajo();
+        }
+        for(int i = 0; i < empleadosLibres.size(); i++) {
+            empleadosNoAsignados[empleadosLibres.size() + i] = empleadosLibres.get(i).obtenerLegajo();
+        }
+        return empleadosNoAsignados;
 	}
 
 	@Override
 	public boolean estaFinalizado(Integer numero) {
-		// TODO Auto-generated method stub
-		return false;
+		return proyectos.get(numero).obtenerEstado() == "finalizado";
 	}
 
 	@Override
@@ -308,45 +325,82 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public List<Tupla<Integer, String>> empleadosAsignadosAProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		Proyecto proyecto = proyectos.get(numero);
+        List<Tupla<Integer, String>> lista = new ArrayList();
+
+        for(IEmpleado empleado : proyecto.ObtenerHistorialDeEmpleados()){
+            Tupla<Integer, String> datosEmpleado = new Tupla<Integer,String>(empleado.obtenerLegajo(), empleado.obtenerNombre());
+            lista.add(datosEmpleado);
+        }
+		return lista;
 	}
 
 	@Override
 	public Object[] tareasProyectoNoAsignadas(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		Proyecto proyecto = proyectos.get(numero);
+        List<Tarea> tareas = proyecto.obtenerTareas();
+        List<Object> tareasDeProyecto = new ArrayList();
+
+        for(Tarea tarea : tareas) {
+            if(tarea.obtenerEmpleado() == null) {
+                tareasDeProyecto.add(tarea);
+            }
+        }
+
+        Object[] tareasArray = new Object[tareasDeProyecto.size()];
+
+        for (int i = 0; i < tareasDeProyecto.size(); i++) {
+            tareasArray[i] = tareasDeProyecto.get(i);
+        }
+
+		return tareasArray;
 	}
 
 	@Override
 	public Object[] tareasDeUnProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		Proyecto proyecto = proyectos.get(numero);
+        List listaTareas = proyecto.obtenerTareas();
+        Object[] tareasDeProyecto = new Object[listaTareas.size()];
+
+        for(int i = 0; i < listaTareas.size(); i++) {
+            tareasDeProyecto[i] = listaTareas.get(i);
+        }
+
+        return tareasDeProyecto;
 	}
 
 	@Override
 	public String consultarDomicilioProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		return proyectos.get(numero).obtenerDomicilio();
 	}
 
 	@Override
 	public boolean tieneRestrasos(Integer legajo) {
-		// TODO Auto-generated method stub
-		return false;
+		for (IEmpleado empleado : empleadosLibres) {
+            if (empleado.obtenerLegajo().equals(legajo)) {
+                return empleado.obtenerRetrasos() > 0;
+            }
+        }
+        throw new RuntimeException("Empleado con legajo " + legajo + " no encontrado");
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> empleados() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Tupla<Integer, String>> lista = new ArrayList<>();
+
+        for(IEmpleado empleado: empleados.values()) {
+            Integer legajo = empleado.obtenerLegajo();
+            String nombre = empleado.obtenerNombre();
+            lista.add(new Tupla<>(legajo, nombre));
+        }
+        return lista;
 	}
 
 	@Override
 	public String consultarProyecto(Integer numero) {
-		// TODO Auto-generated method stub
-		return null;
+		return proyectos.get(numero).mostrarInfo();
 	}
     
 }
+
 
