@@ -85,6 +85,10 @@ public class Tarea {
 	public double obtenerDuracionDias() {
 		return duracionDias;
 	}
-    
+    @Override
+    public String toString() {
+        return "Tarea\ntitulo = " + titulo;    
+    }
 }
+
 
