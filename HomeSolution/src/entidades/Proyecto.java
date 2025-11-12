@@ -186,6 +186,18 @@ public class Proyecto {
 	public String obtenerDomicilio() {
 		return domicilio;
 	}
-    
+    public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
+        return historialEmpleados;
+    }
+    public String mostrarInfo() {
+        return "Proyecto: " +
+            "codigo=" + codigoProyecto +
+            ", domicilio='" + domicilio + '\'' +
+            ", inicio='" + fechaInicio + '\'' +
+            ", fin='" + fechaFin + '\'' +
+            ", estado='" + estado + '\'' +
+            ", tareas=" + (tareas != null ? tareas.size() : 0);
+    }
 }
+
 
