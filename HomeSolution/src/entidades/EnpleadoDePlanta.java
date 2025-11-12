@@ -41,4 +41,10 @@ public class EnpleadoDePlanta extends Empleado{
 
     @Override
     public boolean esDePlanta() { return true; }
+	@Override
+    public String toString() {
+        return "EnpleadoDePlanta: \n" + 
+                super.toString() + "valorDia = " + valorDia + ",\n categoria = " + categoria;
+    }
 }
+
