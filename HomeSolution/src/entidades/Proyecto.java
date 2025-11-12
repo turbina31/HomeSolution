@@ -189,6 +189,12 @@ public class Proyecto {
     public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
         return historialEmpleados;
     }
+	@Override
+    public String toString() {
+        return "Proyecto \ncodigoProyecto = " + codigoProyecto + ",\n domicilio = " + domicilio + 
+        ",\n fechaInicio = " + fechaInicio + ",\n fechaFin = " + fechaFin + ",\n clientes = " + clientes + 
+        ",\n tareas = " + tareas + ",\n estado = " + estado;
+    }
     public String mostrarInfo() {
         return "Proyecto: " +
             "codigo=" + codigoProyecto +
@@ -199,5 +205,6 @@ public class Proyecto {
             ", tareas=" + (tareas != null ? tareas.size() : 0);
     }
 }
+
 
 
