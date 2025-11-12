@@ -400,7 +400,20 @@ public class HomeSolution implements IHomeSolution{
 	public String consultarProyecto(Integer numero) {
 		return proyectos.get(numero).mostrarInfo();
 	}
-    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("empleados:\n");
+        for (IEmpleado e : empleados.values()) {
+            sb.append(" ").append(e).append("\n");
+        }
+        sb.append(", \nproyectos\n");
+        for (Proyecto p : proyectos.values()) {
+            sb.append(" ").append(p).append("\n");
+        }
+        return sb.toString();
+    }
 }
+
 
 
