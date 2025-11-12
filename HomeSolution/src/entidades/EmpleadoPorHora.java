@@ -12,4 +12,9 @@ public class EmpleadoPorHora extends Empleado{
     public double calcularCosto(double dias) {
         return valorHora * 8 * Math.ceil(dias); // medio día = día completo
     }
+	@Override
+    public String toString() {
+        return "EmpleadoPorHora [valorHora=" + valorHora + "]";
+    }
 }
+
