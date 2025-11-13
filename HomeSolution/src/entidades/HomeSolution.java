@@ -306,9 +306,6 @@ public class HomeSolution implements IHomeSolution{
         for(int i = 0; i < empleadosLibres.size(); i++) {
             empleadosNoAsignados[i] = empleadosLibres.get(i).obtenerLegajo();
         }
-        for(int i = 0; i < empleadosLibres.size(); i++) {
-            empleadosNoAsignados[empleadosLibres.size() + i] = empleadosLibres.get(i).obtenerLegajo();
-        }
         return empleadosNoAsignados;
 	}
 
@@ -319,8 +316,12 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public int consultarCantidadRetrasosEmpleado(Integer legajo) {
-		// TODO Auto-generated method stub
-		return 0;
+		for(IEmpleado e : empleados.values()){
+            if(e.obtenerLegajo().equals(legajo)){
+                return e.obtenerRetrasos();
+            }
+        }
+        throw new RuntimeException("empleado no encontrado.");
 	}
 
 	@Override
@@ -414,6 +415,7 @@ public class HomeSolution implements IHomeSolution{
         return sb.toString();
     }
 }
+
 
 
 
