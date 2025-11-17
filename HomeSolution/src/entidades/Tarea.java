@@ -9,10 +9,9 @@ public class Tarea {
     private double diasRetraso;
     private LocalDate fechaEstimada;
     private IEmpleado empleado;
-    private EnpleadoDePlanta enpleadoDePlanta;
     private boolean finalizada; // Nuevo campo
     private String estado; // Reemplaza finalizado
-    private final Estado tipoDeEstado = new Estado();
+    private Estado tipoDeEstado = new Estado();
 
     // Constructor
     public Tarea(String titulo, String descripcion, double duracionDias) {
@@ -32,7 +31,6 @@ public class Tarea {
         this.duracionDias = duracionDias;
         this.diasRetraso = 0;
         this.empleado = null; // Sin asignar inicialmente
-        this.enpleadoDePlanta = null;
         this.finalizada = false;
         this.estado = tipoDeEstado.pendiente;
     }
@@ -40,10 +38,6 @@ public class Tarea {
 
     public IEmpleado obtenerEmpleado() {
         return empleado;
-    }
-
-    public EnpleadoDePlanta obtenerEmpleadoDePlanta(){
-        return enpleadoDePlanta;
     }
 
     public void asignarEmpleado(IEmpleado empleado) {
@@ -64,6 +58,9 @@ public class Tarea {
     public void registrarRetraso(double diasRetraso) {
         if (diasRetraso < 0)
             throw new RuntimeException("Los días de retraso no pueden ser negativos");
+        for(int i = 1; i < (int) diasRetraso; i ++) {
+            empleado.sumarRetraso();
+        }
         this.diasRetraso += diasRetraso;
     }
 
@@ -101,5 +98,10 @@ public class Tarea {
 	public double obtenerDuracionDias() {
 		return duracionDias;
 	}
-    
+    @Override
+    public String toString() {
+        return "Tarea\ntitulo = " + titulo;    
+    }
 }
+
+

@@ -9,7 +9,6 @@ public class EnpleadoDePlanta extends Empleado{
             "INICIAL", 1.0, "TECNICO", 1.5, "EXPERTO", 2.0);
     private static final double DIAS_LABORABLES_MES = 20.0;
     private static final double ADICIONAL = 1.02; // 2% adicional
-    private boolean libre;
     private int proximoLegajo = 10;
     private int legajo = 0;
 
@@ -21,13 +20,12 @@ public class EnpleadoDePlanta extends Empleado{
             throw new IllegalArgumentException("Categoría inválida: " + categoria);
         this.valorDia = valorDia;
         this.categoria = categoria.toUpperCase();
-        this.libre = true;
     }
 
-    @Override
-    public boolean estaLibre() {
-        return this.libre;
-    }
+    // @Override
+    // public boolean estaLibre() {
+    //     return this.libre;
+    // }
 
     @Override
     public double calcularCosto(double dias) {
@@ -41,4 +39,10 @@ public class EnpleadoDePlanta extends Empleado{
 
     @Override
     public boolean esDePlanta() { return true; }
+	@Override
+    public String toString() {
+        return "EnpleadoDePlanta: \n" + 
+                super.toString() + "valorDia = " + valorDia + ",\n categoria = " + categoria;
+    }
 }
+

@@ -101,7 +101,6 @@ public class HomeSolutionTest {
     // ============================================================
     // REASIGNACIÓN Y FINALIZACIÓN
     // ============================================================
-    //Aca creo que es una mala interpretacion mia de la consigna
     @Test(expected = IllegalArgumentException.class)
     public void testTareasNoAsignadasProyectoFinalizadoLanzaExcepcion() {
         Integer numeroProyecto = (homeSolution.proyectosPendientes().get(0)).getValor1();

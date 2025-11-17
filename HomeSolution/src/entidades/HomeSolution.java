@@ -1,34 +1,26 @@
 package entidades;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import javax.swing.JOptionPane;
 
 public class HomeSolution implements IHomeSolution{
 	private HashMap<String, IEmpleado> empleados;
-	private HashMap<String, EnpleadoDePlanta> empleadosDePlantas;
     private Stack<IEmpleado> empleadosLibres;
-    private Stack<EnpleadoDePlanta> empleadosDePlantaLibres;
     private HashMap<String, Tarea> tareas;
     private HashMap<String, Cliente> clientes;
     private HashMap<Integer, Proyecto> proyectos;
     private List<Proyecto> listaProyectos;
-    private Proyecto proyecto;
-    private Map<Integer, Integer> atrasosPorEmpleado;
-    private final Estado tipoDeEstado = new Estado();
 
     public HomeSolution() {
         this.empleados = new HashMap<>();
-        this.empleadosDePlantas = new HashMap<>();
         this.empleadosLibres = new Stack<>();
-        this.empleadosDePlantaLibres = new Stack<>();
         this.tareas = new HashMap<>();
         this.clientes = new HashMap<>();
         this.proyectos = new HashMap<>();
         this.listaProyectos = new ArrayList<>();
-        this.proyecto = null;
-        this.atrasosPorEmpleado = new HashMap<>();
     }
 
 	@Override
@@ -36,7 +28,6 @@ public class HomeSolution implements IHomeSolution{
         try {
             if (empleados.containsKey(nombre))
                 throw new IllegalArgumentException("El nombre: " + nombre + " ya está registrado");
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -44,8 +35,7 @@ public class HomeSolution implements IHomeSolution{
             throw new IllegalArgumentException("El valor no puede ser menor a 0: " + valor);
         EmpleadoPorHora empleado = new EmpleadoPorHora(nombre, valor);
         empleados.put(nombre, empleado);
-        empleadosLibres.push(empleado);
-		// JOptionPane.showMessageDialog(null, "Empleado " + nombre + " registrado con exito!");
+        agregarEmpleadoLibre(empleado);
 	}
 
 	@Override
@@ -54,7 +44,8 @@ public class HomeSolution implements IHomeSolution{
             throw new IllegalArgumentException("El nombre: " + nombre + " ya está registrado");
         EnpleadoDePlanta empleado = new EnpleadoDePlanta(nombre, valor, categoria);
         empleados.put(nombre, empleado);
-        empleadosDePlantaLibres.push(empleado);
+        agregarEmpleadoLibre(empleado);
+        // empleadosDePlantaLibres.push(empleado);
 		// JOptionPane.showMessageDialog(null, "Empleado " + nombre + " registrado con exito!");
 	}
 
@@ -98,29 +89,20 @@ public class HomeSolution implements IHomeSolution{
         if (proyecto == null)
             throw new RuntimeException("El número de proyecto no está registrado");
 
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         if (tarea == null)
             throw new RuntimeException("La tarea no está registrada");
 
         IEmpleado empleadoAnterior = tarea.obtenerEmpleado();
         if (empleadoAnterior != null && !empleadoAnterior.estaLibre()) {
             empleadoAnterior.estaLibre();
-            empleadosLibres.push(empleadoAnterior);
+            agregarEmpleadoLibre(empleadoAnterior);
         }
 
         IEmpleado empleadoAAsignar = null;
         if(empleadosLibres.size() > 0){
             empleadoAAsignar = empleadosLibres.pop();
         }
-        if(empleadoAAsignar == null && empleadosDePlantaLibres.size() > 0){
-            empleadoAAsignar = empleadosDePlantaLibres.pop();
-        }
-        // for( IEmpleado empleado : empleados.values()) {
-        //     if(empleado.estaLibre()){
-        //         empleadoAAsignar = empleado;
-        //         establecerEmpleadoAsignado(empleado);
-        //     }
-        // }
 
         if(empleadoAAsignar == null)
         throw new RuntimeException("No existe ningun empleado libre");
@@ -136,7 +118,7 @@ public class HomeSolution implements IHomeSolution{
         if (!tareas.containsKey(titulo))
             throw new RuntimeException("La tarea no está registrada");
 
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         if (tarea.obtenerEstado().equals("FINALIZADO"))
             throw new RuntimeException("No se pueden asignar empleados a una tarea finalizada");
 
@@ -159,7 +141,8 @@ public class HomeSolution implements IHomeSolution{
         mejorCandidato = tarea.obtenerEmpleado();
         if (!mejorCandidato.estaLibre()) {
             mejorCandidato.estaLibre();
-            empleadosLibres.push(mejorCandidato);
+            agregarEmpleadoLibre(mejorCandidato);
+            // empleadosLibres.push(mejorCandidato);
         }
 
         proyecto.asignarEmpleado(tarea, mejorCandidato);
@@ -174,7 +157,7 @@ public class HomeSolution implements IHomeSolution{
             throw new RuntimeException("El número de proyecto no está registrado");
         if (!tareas.containsKey(titulo))
             throw new RuntimeException("La tarea no está registrada");
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         tarea.registrarRetraso(cantidadDias);
 	}
 
@@ -202,7 +185,7 @@ public class HomeSolution implements IHomeSolution{
             throw new Exception("El número de proyecto no está registrado");
 
         // Validar tarea
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         if (tarea == null)
             throw new Exception("La tarea no está registrada");
 
@@ -222,13 +205,19 @@ public class HomeSolution implements IHomeSolution{
 		Proyecto proyecto = proyectos.get(numero);
         if (proyecto == null)
             throw new RuntimeException("El número de proyecto no está registrado");
+
+        LocalDate fechaFin = LocalDate.parse(fin, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        if(fechaFin.isBefore(proyecto.obtenerFechaInicio())) {
+            throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio");
+        }
         proyecto.finalizar(fin);
         // Liberar empleados
         for (Tarea tarea : proyecto.obtenerTareas()) {
             IEmpleado emp = tarea.obtenerEmpleado();
             if (emp != null && !emp.estaLibre()) {
-                emp.estaLibre();
-                empleadosLibres.push(emp);
+                emp.liberar();
+                agregarEmpleadoLibre(emp);
+                // empleadosLibres.push(emp);
             }
         }
 	}
@@ -255,7 +244,7 @@ public class HomeSolution implements IHomeSolution{
         }
 
 
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         try {
             if (tarea == null)
                 throw new Exception("La tarea no está registrada");
@@ -295,7 +284,7 @@ public class HomeSolution implements IHomeSolution{
         if(empleadoConMenosRetraso == null)
             throw new RuntimeException("No existe ningun empleado libre");
 
-        Tarea tarea = tareas.get(titulo);
+        Tarea tarea = proyecto.obtenerTarea(titulo);
         if (tarea == null)
             throw new Exception("La tarea no está registrada");
 
@@ -332,38 +321,40 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosPendientes() {
-        List<Tupla<Integer, String>> pendientes = new ArrayList<>();
+		List<Tupla<Integer, String>> pendientes = new ArrayList<>();
         for (Proyecto tupla : proyectos.values()) {
-			if (tupla.obtenerEstado() == "PENDIENTE") {
-				pendientes.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
-			}
-		}
-		return pendientes;
+            if (tupla.obtenerEstado() == "PENDIENTE") {
+                pendientes.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+            }
+        }
+        return pendientes;
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> proyectosActivos() {
 		List<Tupla<Integer, String>> activos = new ArrayList<>();
         for (Proyecto tupla : proyectos.values()) {
-			if (tupla.obtenerEstado() == "ACTIVO") {
-				activos.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
-			}
-		}
-		return activos;
+            if (tupla.obtenerEstado() == "ACTIVO") {
+                activos.add(new Tupla<>(tupla.obtenerCodigoProyecto(), tupla.obtenerDomicilio()));
+            }
+        }
+        return activos;
 	}
 
 	@Override
 	public Object[] empleadosNoAsignados() {
-        int cantEmpleadosLibres = empleadosLibres.size() + empleadosDePlantaLibres.size();
-		Object[] empleadosNoAsignados = new Object[cantEmpleadosLibres];
+		int cantEmpleadosLibres = 0;
+        for(IEmpleado empleado : empleados.values()) {
+            if(empleado.estaLibre()) {
+                cantEmpleadosLibres++;
+            }
+        }
+        Object[] empleadosNoAsignados = new Object[cantEmpleadosLibres];
 
-        for(int i = 0; i < empleadosLibres.size(); i++) {
+        for(int i = 0; i < cantEmpleadosLibres; i++) {
             empleadosNoAsignados[i] = empleadosLibres.get(i).obtenerLegajo();
         }
-        for(int i = 0; i < empleadosLibres.size(); i++) {
-            empleadosNoAsignados[empleadosLibres.size() + i] = empleadosLibres.get(i).obtenerLegajo();
-        }
-		return empleadosNoAsignados;
+        return empleadosNoAsignados;
 	}
 
 	@Override
@@ -373,13 +364,23 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public int consultarCantidadRetrasosEmpleado(Integer legajo) {
-        String nombre = obtenerEmpleadoPorLegajo(legajo);
-		return empleados.get(nombre).obtenerRetrasos();
+        IEmpleado empleadoSeleccionado = null;
+
+        for(IEmpleado empleado: empleados.values()) {
+            Integer legajoBuscado = empleado.obtenerLegajo();
+            if(legajoBuscado.equals(legajo)) {
+                empleadoSeleccionado = empleado;
+            }
+        }
+
+        return empleadoSeleccionado.obtenerRetrasos();
+        // String nombre = obtenerEmpleadoPorLegajo(legajo);
+		// return empleados.get(nombre).obtenerRetrasos();
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> empleadosAsignadosAProyecto(Integer numero) {
-        Proyecto proyecto = proyectos.get(numero);
+		Proyecto proyecto = proyectos.get(numero);
         List<Tupla<Integer, String>> lista = new ArrayList();
 
         for(IEmpleado empleado : proyecto.ObtenerHistorialDeEmpleados()){
@@ -391,7 +392,10 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public Object[] tareasProyectoNoAsignadas(Integer numero) {
-        Proyecto proyecto = proyectos.get(numero);
+		Proyecto proyecto = proyectos.get(numero);
+        if(proyecto.obtenerEstado() == "FINALIZADO") {
+            throw new IllegalArgumentException("El proyecto ya esta finalizado");
+        }
         List<Tarea> tareas = proyecto.obtenerTareas();
         List<Object> tareasDeProyecto = new ArrayList();
 
@@ -412,7 +416,7 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public Object[] tareasDeUnProyecto(Integer numero) {
-        Proyecto proyecto = proyectos.get(numero);
+		Proyecto proyecto = proyectos.get(numero);
         List listaTareas = proyecto.obtenerTareas();
         Object[] tareasDeProyecto = new Object[listaTareas.size()];
 
@@ -420,7 +424,7 @@ public class HomeSolution implements IHomeSolution{
             tareasDeProyecto[i] = listaTareas.get(i);
         }
 
-		return tareasDeProyecto;
+        return tareasDeProyecto;
 	}
 
 	@Override
@@ -430,39 +434,47 @@ public class HomeSolution implements IHomeSolution{
 
 	@Override
 	public boolean tieneRestrasos(Integer legajo) {
-        String nombre = obtenerEmpleadoPorLegajo(legajo);
-		return empleados.get(nombre).obtenerRetrasos() > 0;
+		for (IEmpleado empleado : empleados.values()) {
+            if (empleado.obtenerLegajo().equals(legajo)) {
+                return empleado.obtenerRetrasos() > 0;
+            }
+        }
+        throw new RuntimeException("Empleado con legajo " + legajo + " no encontrado");
 	}
 
 	@Override
 	public List<Tupla<Integer, String>> empleados() {
-        List<Tupla<Integer, String>> lista = new ArrayList<>();
+		List<Tupla<Integer, String>> lista = new ArrayList<>();
 
         for(IEmpleado empleado: empleados.values()) {
             Integer legajo = empleado.obtenerLegajo();
             String nombre = empleado.obtenerNombre();
             lista.add(new Tupla<>(legajo, nombre));
         }
-		return lista;
+        return lista;
 	}
 
 	@Override
 	public String consultarProyecto(Integer numero) {
 		return proyectos.get(numero).mostrarInfo();
 	}
-
-    private String obtenerEmpleadoPorLegajo(Integer legajo) {
-        for (IEmpleado empleado : empleados.values()) {
-            if (empleado.obtenerLegajo().equals(legajo)) {
-                return empleado.obtenerNombre();
-            }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("empleados:\n");
+        for (IEmpleado e : empleados.values()) {
+            sb.append(" ").append(e).append("\n");
         }
-
-        throw new RuntimeException("No se encontró ningún empleado con legajo: " + legajo);
+        sb.append(", \nproyectos\n");
+        for (Proyecto p : proyectos.values()) {
+            sb.append(" ").append(p).append("\n");
+        }
+        return sb.toString();
     }
 
-    private void establecerEmpleadoAsignado(IEmpleado empleado) {
-        empleado.marcarAsignado();
-        // empleadosLibres.get(empleado)
+    private void agregarEmpleadoLibre(IEmpleado empleado) {
+        if(empleado.estaLibre() && !empleadosLibres.contains(empleado)) {
+            empleadosLibres.add(empleado);
+        }
     }
 }

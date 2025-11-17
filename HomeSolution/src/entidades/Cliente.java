@@ -20,5 +20,9 @@ public class Cliente {
 	public String obtenerEmail() {
 		return email;
 	}
-    
+    @Override
+    public String toString() {
+        return "Cliente\nnombre = " + nombre + ",\n telefono = " + telefono + ",\n email = " + email;
+    }
 }
+

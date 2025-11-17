@@ -15,11 +15,9 @@ public class Proyecto {
     private Map<String, Cliente> clientes;
     private List<Tarea> tareas;
     private Map<String, Tarea> tarea;
-    private Stack<IEmpleado> empleadosLibres;
     private String estado; // Reemplaza finalizado
-    private final Estado tipoDeEstado = new Estado();
+    private Estado tipoDeEstado = new Estado();
     private Set<IEmpleado> historialEmpleados;
-    private Map<Integer, Boolean> retrasosEmpleadosPlanta;
     private boolean tieneRetraso = false;
 
     public Proyecto(int codigoProyecto, String domicilio, String fechaInicio, String fechaFin) {
@@ -47,7 +45,7 @@ public class Proyecto {
         this.clientes = new HashMap<String, Cliente>();
         this.tarea = new HashMap<>();
         this.tareas = new ArrayList<>();
-        this.empleadosLibres = new Stack<>();
+        // this.empleadosLibres = new Stack<>();
         this.estado = tipoDeEstado.pendiente;
         this.historialEmpleados = new HashSet<>();
     }
@@ -106,6 +104,8 @@ public class Proyecto {
         if (empleado != null) {
             historialEmpleados.add(empleado);
         }
+
+        estado = "ACTIVO";
     }
 
     public String obtenerEstado() {
@@ -114,6 +114,21 @@ public class Proyecto {
 
     public List<Tarea> obtenerTareas() {
         return new ArrayList<>(tareas); // Copia defensiva
+    }
+
+    public Tarea obtenerTarea(String titulo) {
+        if(!perteneceAestaTarea(titulo)){
+            throw new RuntimeException("La tarea no pertenece al proyecto");
+        }
+        Tarea tareaEncontrada = null;
+
+        for(Tarea tarea : tareas) {
+            if(tarea.obtenerTitulo().equals(titulo)) {
+                tareaEncontrada = tarea;
+            }
+        }
+
+        return tareaEncontrada;
     }
 
     public boolean perteneceAestaTarea(String titulo){
@@ -131,7 +146,6 @@ public class Proyecto {
         IEmpleado empleado = t.obtenerEmpleado();
         if (empleado != null && !empleado.estaLibre()) {
             empleado.estaLibre();
-            empleadosLibres.push(empleado);
             t.asignarEmpleado(null);
         }
     }
@@ -197,7 +211,18 @@ public class Proyecto {
 	public String obtenerDomicilio() {
 		return domicilio;
 	}
-    
+    public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
+        return historialEmpleados;
+    }
+    public LocalDate obtenerFechaInicio() {
+        return LocalDate.parse(fechaInicio, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+	@Override
+    public String toString() {
+        return "Proyecto \ncodigoProyecto = " + codigoProyecto + ",\n domicilio = " + domicilio + 
+        ",\n fechaInicio = " + fechaInicio + ",\n fechaFin = " + fechaFin + ",\n clientes = " + clientes + 
+        ",\n tareas = " + tareas + ",\n estado = " + estado;
+    }
     public String mostrarInfo() {
         return "Proyecto: " +
             "codigo=" + codigoProyecto +
@@ -205,11 +230,9 @@ public class Proyecto {
             ", inicio='" + fechaInicio + '\'' +
             ", fin='" + fechaFin + '\'' +
             ", estado='" + estado + '\'' +
-            ", tareas=" + (tareas != null ? tareas.size() : 0) +
-            ", empleadosLibres=" + (empleadosLibres != null ? empleadosLibres.size() : 0);
-    }
-
-    public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
-        return this.historialEmpleados;
+            ", tareas=" + (tareas != null ? tareas.size() : 0);
     }
 }
+
+
+

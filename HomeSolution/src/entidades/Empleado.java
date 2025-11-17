@@ -6,11 +6,13 @@ public abstract class Empleado implements IEmpleado{
     protected final String nombre;
     protected int retrasos = 0;
     protected boolean asignado;
+    // protected boolean libre;
 
     public Empleado(String nombre) {
     	this.legajo = contador++;
         this.nombre = nombre;
         this.asignado = false;
+        // this.libre = true;
     }
 
     @Override public Integer obtenerLegajo() { return legajo; }
@@ -30,4 +32,10 @@ public abstract class Empleado implements IEmpleado{
     }
 
     public void asignar() { this.asignado = true; }
+	@Override
+    public String toString() {
+        return getClass().getSimpleName() + "Empleado\nlegajo = " + legajo + ",\n nombre = " + 
+        nombre + ",\n retrasos = " + retrasos + ",\n asignado = " + asignado;
+    }
 }
+
