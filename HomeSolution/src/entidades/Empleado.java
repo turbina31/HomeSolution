@@ -28,12 +28,12 @@ public abstract class Empleado implements IEmpleado{
     public void marcarOcupado() {
     	this.asignado = true;
     }
-
-    public void asignar() { this.asignado = true; }
+	
 	@Override
     public String toString() {
         return getClass().getSimpleName() + "Empleado\nlegajo = " + legajo + ",\n nombre = " + 
         nombre + ",\n retrasos = " + retrasos + ",\n asignado = " + asignado;
     }
 }
+
 
