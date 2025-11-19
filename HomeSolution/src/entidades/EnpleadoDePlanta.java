@@ -25,11 +25,6 @@ public class EnpleadoDePlanta extends Empleado{
     }
 
     @Override
-    public boolean estaLibre() {
-        return this.libre;
-    }
-
-    @Override
     public double calcularCosto(double dias) {
         double factor = tipos_de_CATEGORIA.get(categoria);
         double costoBase = (valorDia * DIAS_LABORABLES_MES * 8.0) / DIAS_LABORABLES_MES * dias * factor;
@@ -41,10 +36,12 @@ public class EnpleadoDePlanta extends Empleado{
 
     @Override
     public boolean esDePlanta() { return true; }
+	
 	@Override
     public String toString() {
         return "EnpleadoDePlanta: \n" + 
                 super.toString() + "valorDia = " + valorDia + ",\n categoria = " + categoria;
     }
 }
+
 
