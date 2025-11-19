@@ -18,7 +18,7 @@ public class Proyecto {
     private String estado; // Reemplaza finalizado
     private Estado tipoDeEstado = new Estado();
     private Set<IEmpleado> historialEmpleados;
-    private boolean tieneRetraso = false;
+    private boolean tieneRetraso;
 
     public Proyecto(int codigoProyecto, String domicilio, String fechaInicio, String fechaFin) {
         if (codigoProyecto < 0)
@@ -46,6 +46,7 @@ public class Proyecto {
         this.tarea = new HashMap<>();
         this.tareas = new ArrayList<>();
         this.empleadosLibres = new Stack<>();
+		this.tieneRetraso = false;
         this.estado = tipoDeEstado.pendiente;
         this.historialEmpleados = new HashSet<>();
     }
@@ -55,33 +56,38 @@ public class Proyecto {
     }
     
     public void agregarTarea(Tarea tarea) {
-        if (tarea == null)
-            throw new RuntimeException("La tarea no puede ser nula");
-        if (this.estado.equals(tipoDeEstado.finalizado))
+        if (this.estado.equals(Estado.finalizado))
             throw new RuntimeException("No se pueden agregar tareas a un proyecto finalizado");
-        tareas.add(tarea);
+        tareas.add(new Tarea(titulo, descripcion, dias));
     }
 
     public void asignarEmpleado(Tarea tarea, IEmpleado empleado) {
+		try {
+            // Validar que el proyecto no esté finalizado
+            if (this.estado.equals(Estado.finalizado))
+                throw new RuntimeException("No se pueden asignar empleados a un proyecto finalizado");
 
-        // Validar que el proyecto no esté finalizado
-        if (this.estado.equals(tipoDeEstado.finalizado))
-            throw new RuntimeException("No se pueden asignar empleados a un proyecto finalizado");
-
-        // Validar que el empleado esté libre (si no es null)
-        if (empleado != null && !empleado.estaLibre())
-            throw new RuntimeException("El empleado debe estar libre");
+            // Validar que el empleado esté libre (si no es null)
+            if (empleado != null && !empleado.estaLibre())
+                throw new RuntimeException("El empleado debe estar libre");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         // Verificar que la tarea pertenece al proyecto
         boolean tareaEncontrada = false;
         Iterator<Tarea> este = tareas.iterator();
         while (este.hasNext()) {
-            if (este.next() == tarea) { // Comparación por referencia
+            if (este.next().obtenerTitulo().equals(tarea.obtenerTitulo())) { // Comparación por referencia
                 tareaEncontrada = true;
             }
         }
-        if (!tareaEncontrada)
-            throw new RuntimeException("La tarea no pertenece al proyecto");
+        try {
+            if (!tareaEncontrada)
+                throw new RuntimeException("La tarea no pertenece al proyecto");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         // Liberar empleado anterior, si existe
         IEmpleado empleadoAnterior = tarea.obtenerEmpleado();
@@ -102,6 +108,21 @@ public class Proyecto {
         return estado;
     }
 
+	public Tarea obtenerTarea(String titulo) {
+        if(!perteneceAestaTarea(titulo)){
+            throw new RuntimeException("La tarea no pertenece al proyecto");
+        }
+        Tarea tareaEncontrada = null;
+
+        for(Tarea tarea : tareas) {
+            if(tarea.obtenerTitulo().equals(titulo)) {
+                tareaEncontrada = tarea;
+            }
+        }
+
+        return tareaEncontrada;
+    }
+	
     public List<Tarea> obtenerTareas() {
         return new ArrayList<>(tareas); // Copia defensiva
     }
@@ -137,7 +158,7 @@ public class Proyecto {
     }
 
     public void finalizar(String fechaRealFin) {
-        if (estado.equals(tipoDeEstado.finalizado))
+        if (estado.equals(Estado.finalizado))
             throw new RuntimeException("El proyecto ya está finalizado");
         if (fechaRealFin == null)
             throw new RuntimeException("La fecha real de fin no puede ser nula");
@@ -153,7 +174,7 @@ public class Proyecto {
         if (fechaReal.isBefore(this.fechaPrincipio))
             throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio");
         
-        this.estado = tipoDeEstado.finalizado;
+        this.estado = Estado.finalizado;
     }
     
     public double calcularCostoTotal(HashMap<String, IEmpleado> empleados) {
@@ -186,6 +207,11 @@ public class Proyecto {
 	public String obtenerDomicilio() {
 		return domicilio;
 	}
+
+	public LocalDate obtenerFechaInicio() {
+        return LocalDate.parse(fechaInicio, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+	
     public Set<IEmpleado> ObtenerHistorialDeEmpleados() {
         return historialEmpleados;
     }
@@ -205,6 +231,7 @@ public class Proyecto {
             ", tareas=" + (tareas != null ? tareas.size() : 0);
     }
 }
+
 
 
 
