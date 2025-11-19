@@ -35,20 +35,29 @@ public class Tarea {
     }
 
     public void asignarEmpleado(IEmpleado empleado) {
-        if (empleado == null)
-            throw new RuntimeException("El empleado no puede ser nulo");
-        if (!empleado.estaLibre())
-            throw new RuntimeException("El empleado no está libre");
-        if (this.empleado != null)
-            this.empleado.estaLibre(); // Liberar empleado anterior, si existe
+        try {
+            if (empleado == null)
+                throw new RuntimeException("El empleado no puede ser nulo");
+            if (!empleado.estaLibre())
+                throw new RuntimeException("El empleado no está libre");
+            if (this.empleado != null)
+                this.empleado.estaLibre();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         this.empleado = empleado;
-        empleado.marcarAsignado();
+        if (empleado != null) {
+            empleado.marcarAsignado(true);
+        }
     }
 
     public void registrarRetraso(double diasRetraso) {
         if (diasRetraso < 0)
             throw new RuntimeException("Los días de retraso no pueden ser negativos");
-        this.diasRetraso += diasRetraso;
+        for(int i = 1; i < (int) diasRetraso; i ++) {
+            empleado.sumarRetraso();
+        }
+		this.diasRetraso += diasRetraso;
     }
 
     public String obtenerTitulo() {
@@ -90,5 +99,6 @@ public class Tarea {
         return "Tarea\ntitulo = " + titulo;    
     }
 }
+
 
 
