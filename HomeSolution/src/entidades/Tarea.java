@@ -8,10 +8,8 @@ public class Tarea {
     private double duracionDias;
     private double diasRetraso;
     private LocalDate fechaEstimada;
-    private IEmpleado empleado;
-    private boolean finalizada; // Nuevo campo
-    private String estado; // Reemplaza finalizado
-    private Estado tipoDeEstado = new Estado();
+    private IEmpleado empleadoAsignado;;
+    private boolean finalizada;
 
     // Constructor
     public Tarea(String titulo, String descripcion, double duracionDias) {
@@ -25,9 +23,8 @@ public class Tarea {
         this.descripcion = descripcion;
         this.duracionDias = duracionDias;
         this.diasRetraso = 0;
-        this.empleado = null; // Sin asignar inicialmente
+        this.empleadoAsignado; = null; // Sin asignar inicialmente
         this.finalizada = false;
-        this.estado = tipoDeEstado.pendiente;
     }
 
     public IEmpleado obtenerEmpleado() {
@@ -35,17 +32,10 @@ public class Tarea {
     }
 
     public void asignarEmpleado(IEmpleado empleado) {
-        try {
-            if (empleado == null)
-                throw new RuntimeException("El empleado no puede ser nulo");
-            if (!empleado.estaLibre())
-                throw new RuntimeException("El empleado no está libre");
-            if (this.empleado != null)
-                this.empleado.estaLibre();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (empleadoAsignado != null) {
+            empleadoAsignado.marcarAsignado(false);
         }
-        this.empleado = empleado;
+        this.empleadoAsignado = empleado;
         if (empleado != null) {
             empleado.marcarAsignado(true);
         }
@@ -83,10 +73,11 @@ public class Tarea {
         return finalizada;
     }
 
-    public void marcarComoFinalizada() {
-        if (finalizada)
-            throw new RuntimeException("La tarea ya está finalizada");
+    public void finalizar() {
         this.finalizada = true;
+        if (empleadoAsignado != null) {
+            empleadoAsignado.marcarAsignado(false);
+        }
     }
 
     public double obtenerDiasEstimados() { return this.diasRetraso; }
@@ -99,6 +90,7 @@ public class Tarea {
         return "Tarea\ntitulo = " + titulo;    
     }
 }
+
 
 
 
