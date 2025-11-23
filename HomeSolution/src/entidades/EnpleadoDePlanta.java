@@ -26,9 +26,8 @@ public class EnpleadoDePlanta extends Empleado{
 
     @Override
     public double calcularCosto(double dias) {
-        double factor = tipos_de_CATEGORIA.get(categoria);
-        double costoBase = (valorDia * DIAS_LABORABLES_MES * 8.0) / DIAS_LABORABLES_MES * dias * factor;
-        return costoBase;
+        long diasRedondeados = Math.round(Math.ceil(dias));
+        return valorDia * diasRedondeados;
     }
     public double calcularCostoConAdicional(double dias) {
         return calcularCosto(dias) * ADICIONAL;
@@ -43,5 +42,6 @@ public class EnpleadoDePlanta extends Empleado{
                 super.toString() + "valorDia = " + valorDia + ",\n categoria = " + categoria;
     }
 }
+
 
 
