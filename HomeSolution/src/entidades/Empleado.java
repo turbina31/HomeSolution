@@ -16,18 +16,18 @@ public abstract class Empleado implements IEmpleado{
     @Override public Integer obtenerLegajo() { return legajo; }
     @Override public String obtenerNombre() { return nombre; }
     @Override public int obtenerRetrasos() { return retrasos; }
-    @Override public void sumarRetraso() { this.retrasos++; }
-    @Override public void liberar() { this.asignado = false; }
-    @Override public boolean estaLibre() { return !asignado; }
-    @Override public boolean esDePlanta() { return false; }
     @Override
-    public void marcarAsignado() {
-    	this.asignado = true;
-    }
-    @Override
-    public void marcarOcupado() {
-    	this.asignado = true;
-    }
+	public boolean estaAsignado() {
+		return asignado;
+	}
+
+	@Override
+	public abstract double calcularCosto(double dias);
+
+	 @Override
+	 public void marcarAsignado(boolean asignado) {
+		this.asignado = asignado;
+	 }
 	
 	@Override
     public String toString() {
@@ -35,5 +35,6 @@ public abstract class Empleado implements IEmpleado{
         nombre + ",\n retrasos = " + retrasos + ",\n asignado = " + asignado;
     }
 }
+
 
 
