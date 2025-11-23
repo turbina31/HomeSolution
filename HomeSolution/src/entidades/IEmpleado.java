@@ -4,11 +4,8 @@ public interface IEmpleado {
 	Integer obtenerLegajo();
     String obtenerNombre();
     double calcularCosto(double dias);
-    boolean esDePlanta();
     int obtenerRetrasos();
+    public boolean estaAsignado();
     void sumarRetraso();
-    void liberar();
-    boolean estaLibre();
-    void marcarAsignado();
-    void marcarOcupado();
+    void marcarAsignado(boolean asignado);
 }
