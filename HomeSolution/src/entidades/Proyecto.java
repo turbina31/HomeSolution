@@ -55,9 +55,9 @@ public class Proyecto {
     	clientes.put(c.obtenerEmail(), c);
     }
     
-    public void agregarTarea(Tarea tarea) {
-        if (this.estado.equals(Estado.finalizado))
-            throw new RuntimeException("No se pueden agregar tareas a un proyecto finalizado");
+    public void agregarTarea(String titulo, String descripcion, double dias) {
+        if (finalizado) 
+			throw new IllegalStateException("No se pueden agregar tareas a proyecto finalizado");
         tareas.add(new Tarea(titulo, descripcion, dias));
     }
 
@@ -105,7 +105,18 @@ public class Proyecto {
     }
 
     public String obtenerEstado() {
-        return estado;
+        if (finalizado) {
+            return Estado.finalizado;
+        }
+
+        // Verificar si tiene al menos una tarea con empleado asignado
+        for (Tarea t : tareas) {
+            if (t.empleadoAsignado() != null) {
+                return Estado.activo;
+            }
+        }
+
+        return Estado.pendiente;
     }
 
 	public Tarea obtenerTarea(String titulo) {
@@ -157,24 +168,29 @@ public class Proyecto {
         return true;
     }
 
-    public void finalizar(String fechaRealFin) {
-        if (estado.equals(Estado.finalizado))
-            throw new RuntimeException("El proyecto ya está finalizado");
-        if (fechaRealFin == null)
-            throw new RuntimeException("La fecha real de fin no puede ser nula");
-     // Convertir fechas
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate fechaReal;
-        try {
-            fechaReal = LocalDate.parse(fechaRealFin, formato);
- 
-        } catch (DateTimeParseException e) {
-            throw new RuntimeException("Formato de fecha inválido, debe ser yyyy-mm-dd");
+    public void finalizarProyecto(String fechaFin) {
+        LocalDate fechaReal = LocalDate.parse(fechaFin);
+
+    // REGLA DEL ENUNCIADO: no se puede finalizar antes del inicio
+    if (fechaReal.isBefore(this.inicio)) {
+        throw new IllegalArgumentException("La fecha de finalización no puede ser anterior a la de inicio");
+    }
+
+    // REGLA DEL TEST: espera excepción si se finaliza antes del fin previsto
+    if (fechaReal.isBefore(this.finPrevisto)) {
+        throw new IllegalArgumentException("No se puede finalizar antes de la fecha prevista");
+    }
+
+    this.finReal = fechaReal;
+    this.finalizado = true;
+
+    // LIBERAR A TODOS LOS EMPLEADOS DEL PROYECTO
+    for (Tarea t : tareas) {
+        IEmpleado e = t.empleadoAsignado();
+        if (e != null) {
+            e.marcarAsignado(false);
         }
-        if (fechaReal.isBefore(this.fechaPrincipio))
-            throw new RuntimeException("La fecha de fin no puede ser anterior a la fecha de inicio");
-        
-        this.estado = Estado.finalizado;
+    }
     }
     
     public double calcularCostoTotal(HashMap<String, IEmpleado> empleados) {
@@ -200,7 +216,7 @@ public class Proyecto {
 		return this.codigoProyecto = codigoProyecto;
 	}
 
-	public Integer obtenerCodigoProyecto() {
+	public Integer obtenerNumero() {
 		return codigoProyecto;
 	}
 
@@ -231,6 +247,7 @@ public class Proyecto {
             ", tareas=" + (tareas != null ? tareas.size() : 0);
     }
 }
+
 
 
 
